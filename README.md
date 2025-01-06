@@ -29,6 +29,33 @@ Make sure you have a PostgreSQL database up and running. You’ll need to provid
 
 Archer relies on a table structure to manage jobs. Ensure you have run the migration script (if provided), or set up your table accordingly.
 
+## How It Works
+
+archer under the hood uses a table like the following.
+
+```sql
+CREATE TABLE jobs (
+  id varchar primary key,
+  queue_name varchar not null,
+  status varchar not null,
+  arguments jsonb not null default '{}'::jsonb,
+  result jsonb not null default '{}'::jsonb,
+  last_error varchar,
+  retry_count integer not null default 0,
+  max_retry integer not null default 0,
+  retry_interval integer not null default 0,
+  scheduled_at timestamptz default now(),
+  started_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+CREATE INDEX ON jobs (queue_name);
+CREATE INDEX ON jobs (scheduled_at);
+CREATE INDEX ON jobs (status);
+CREATE INDEX ON jobs (started_at);
+```
+
 ## Usage
 
 ### Importing the package
