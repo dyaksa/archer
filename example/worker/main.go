@@ -64,11 +64,10 @@ func main() {
 		Addr:     "localhost:5432",
 		Password: "password",
 		User:     "admin",
-		DBName:   "webhooks",
+		DBName:   "core",
 	})
 
-	c.Register("call_api",
-		CallClient,
+	c.Register("call_api", CallClient,
 		archer.WithInstances(1),
 		archer.WithTimeout(1*time.Second),
 	)
