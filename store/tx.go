@@ -119,7 +119,7 @@ func (t *Tx) Poll(ctx context.Context, queueName string) (*job.Job, error) {
 func (t *Tx) RequeueTimeout(ctx context.Context, queueName string, timeout time.Time) error {
 	return exec(ctx, t.Tx, `UPDATE jobs 
 	SET 
-		status=$1 
+		status=$1,
 		started_at=null,
 		retry_count=retry_count+1,
 		updated_at=now()

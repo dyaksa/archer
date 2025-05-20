@@ -1,6 +1,7 @@
 package store
 
 import (
+	"database/sql"
 	"strings"
 	"time"
 
@@ -56,9 +57,14 @@ func (e *entity) To() *job.Job {
 		Result:        e.Result,
 		RetryInterval: e.RetryInterval,
 		ScheduleAt:    e.ScheduledAt.Time,
-		StartedAt:     e.StartedAt.Time,
-		CreatedAt:     e.CreatedAt,
-		UpdadatedAt:   e.UpdatedAt,
+		StartedAt: types.NullTime{
+			NullTime: sql.NullTime{
+				Time:  e.StartedAt.Time,
+				Valid: e.StartedAt.Valid,
+			},
+		},
+		CreatedAt:   e.CreatedAt,
+		UpdadatedAt: e.UpdatedAt,
 	}
 }
 

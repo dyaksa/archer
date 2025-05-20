@@ -4,6 +4,8 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"time"
+
+	"github.com/dyaksa/archer/types"
 )
 
 type Job struct {
@@ -17,7 +19,7 @@ type Job struct {
 	Result        json.RawMessage `json:"result"`
 	RetryInterval time.Duration   `json:"retry_interval"`
 	ScheduleAt    time.Time       `json:"scheduled_at"`
-	StartedAt     time.Time       `json:"started_at"`
+	StartedAt     types.NullTime  `json:"started_at"`
 	CreatedAt     time.Time       `json:"created_at"`
 	UpdadatedAt   time.Time       `json:"updated_at"`
 }

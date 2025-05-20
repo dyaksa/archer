@@ -26,7 +26,7 @@ func main() {
 		Addr:     "localhost:5432",
 		Password: "password",
 		User:     "admin",
-		DBName:   "webhooks",
+		DBName:   "core",
 	})
 
 	dto := DataDto{
@@ -38,7 +38,7 @@ func main() {
 	p := pool.New().WithMaxGoroutines(10).WithErrors()
 
 	p.Go(func() error {
-		for i := 0; i < 1000; i++ {
+		for i := 0; i < 5000; i++ {
 			_, err := c.Schedule(
 				context.Background(),
 				uuid.NewString(),

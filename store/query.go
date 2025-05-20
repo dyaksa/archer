@@ -34,7 +34,9 @@ func queryJobs(ctx context.Context, tx *sql.Tx, query string, args ...any) ([]*j
 
 	for rows.Next() {
 		e := new(entity)
-		err = rows.Scan(e.ScanDestinations()...)
+		if err := rows.Scan(e.ScanDestinations()...); err != nil {
+			return nil, err
+		}
 		entities = append(entities, e.To())
 	}
 
