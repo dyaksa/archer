@@ -38,7 +38,7 @@ func (p *pool) Run(ctx context.Context, errChan chan<- error) {
 				continue
 			}
 
-			if err := p.handler.Handle(context.Background(), *j); err != nil {
+			if err := p.handler.Handle(ctx, *j); err != nil {
 				errChan <- err
 				continue
 			}
