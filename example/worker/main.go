@@ -3,10 +3,11 @@ package main
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"log/slog"
 	"net/http"
 	"time"
+
+	"github.com/goccy/go-json"
 
 	"github.com/dyaksa/archer"
 	"github.com/dyaksa/archer/job"

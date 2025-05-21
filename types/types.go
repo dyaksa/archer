@@ -2,9 +2,10 @@ package types
 
 import (
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"time"
+
+	"github.com/goccy/go-json"
 
 	"github.com/google/uuid"
 )

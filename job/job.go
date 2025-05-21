@@ -2,8 +2,9 @@ package job
 
 import (
 	"database/sql/driver"
-	"encoding/json"
 	"time"
+
+	"github.com/goccy/go-json"
 
 	"github.com/dyaksa/archer/types"
 )
