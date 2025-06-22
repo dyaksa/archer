@@ -118,10 +118,15 @@ func TestPool_Run_ContextCancellation(t *testing.T) {
 
 	testJob := &job.Job{ID: "test_job_id", QueueName: queueName}
 
+	// Expectations for the first Poll that returns a job
 	sqlMock.ExpectBegin()
 	mockTx.On("Poll", mock.Anything, queueName).Return(testJob, nil).Once()
 	sqlMock.ExpectCommit()
 
+	// Subsequent Poll calls after cancellation might happen or pool might exit.
+	// If the Poll happens, it should be ErrorJobNotFound.
+	// No separate sqlmock.ExpectBegin/Commit here as the call itself is .Maybe()
+	// and if it doesn't happen, the strict sqlmock expectations would fail.
 	mockTx.On("Poll", mock.Anything, queueName).Return(nil, job.ErrorJobNotFound).Maybe()
 
 	mockHandler.On("Handle", mock.AnythingOfType("*context.cancelCtx"), *testJob).Return(context.Canceled).Once()
