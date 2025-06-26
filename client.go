@@ -27,8 +27,9 @@ type Options struct {
 }
 
 type Client struct {
-	wrapper wrapperTx
-	tx      func(*sql.Tx) Tx
+	wrapper   wrapperTx
+	tx        func(*sql.Tx) Tx
+	tableName string
 
 	register
 	spawn  Spawner
@@ -72,29 +73,29 @@ func NewClient(opt *Options, options ...ClientOptionFunc) *Client {
 	errChan := make(chan error)
 	ctx, cancel := context.WithCancel(context.Background())
 
-	c := &Client{
-		register: newRegister(),
-		wrapper:  store.NewWrapperTx(db),
-		spawn:    newSpawner(ctx, errChan),
-		errChan:  errChan,
-		shutdown: cancel,
-		tx: func(tx *sql.Tx) Tx {
-			return newTx(tx)
-		},
-		queue: func(name string) *Queue {
-			return NewQueue(db, name)
-		},
-
-		mutate: newMutate(db),
-
-		sleepInterval:  time.Second * 2,
-		reaperInterval: time.Second * 10,
-		errHandler:     defaultErrorHandler,
-	}
+	c := &Client{}
+	c.sleepInterval = time.Second * 2   // default sleepinterval
+	c.reaperInterval = time.Second * 10 // default reaper interval
+	c.errHandler = defaultErrorHandler  // default errhandler
+	c.tableName = "jobs"                // sleep tableName
 
 	for _, opt := range options {
 		c = opt(c)
 	}
+
+	c.register = newRegister()
+	c.wrapper = store.NewWrapperTx(db)
+	c.spawn = newSpawner(ctx, errChan)
+	c.errChan = errChan
+	c.shutdown = cancel
+	c.tx = func(tx *sql.Tx) Tx {
+		return newTx(tx, c.tableName)
+	}
+	c.queue = func(name string) *Queue {
+		return NewQueue(db, name, c.tableName)
+	}
+
+	c.mutate = newMutate(db, c.tableName)
 
 	return c
 }

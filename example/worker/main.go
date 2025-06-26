@@ -29,6 +29,8 @@ func CallClient(ctx context.Context, job job.Job) (any, error) {
 		return nil, err
 	}
 
+	time.Sleep(10 * time.Second)
+
 	slog.Info("started job request id: " + job.ID)
 	defer func() {
 		slog.Info("finished job request id: " + job.ID)
@@ -66,9 +68,14 @@ func main() {
 		Password: "password",
 		User:     "admin",
 		DBName:   "core",
-	})
+	}, archer.WithSetTableName("outbox"))
 
 	c.Register("call_api", CallClient,
+		archer.WithInstances(1),
+		archer.WithTimeout(1*time.Second),
+	)
+
+	c.Register("call_api_2", CallClient,
 		archer.WithInstances(1),
 		archer.WithTimeout(1*time.Second),
 	)

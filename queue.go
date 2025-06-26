@@ -16,13 +16,13 @@ type Queue struct {
 	name string
 }
 
-func NewQueue(db *sql.DB, name string) *Queue {
+func NewQueue(db *sql.DB, name string, tableName string) *Queue {
 	return &Queue{
 		WrapperTx: *store.NewWrapperTx(db),
 		now:       time.Now,
 		name:      name,
 		tx: func(tx *sql.Tx) Tx {
-			return newTx(tx)
+			return newTx(tx, tableName)
 		},
 	}
 }

@@ -22,35 +22,36 @@ type TxStore interface {
 
 type Tx struct {
 	*sql.Tx
+	tableName string
 }
 
-func NewTx(tx *sql.Tx) TxStore {
-	return &Tx{tx}
+func NewTx(tx *sql.Tx, tableName string) TxStore {
+	return &Tx{tx, tableName}
 }
 
 func (t *Tx) Search(ctx context.Context, limit int, offset int, search string) ([]*job.Job, error) {
 	if search != "" {
 		return queryJobs(ctx, t.Tx, `SELECT `+entryFields+`
-		FROM jobs
+		FROM `+t.tableName+`
 		WHERE id LIKE '%' || $1 || '%' 
 		ORDER BY scheduled_at DESC 
 		LIMIT $2 OFFSET $3`, search, limit, offset)
 	}
 
 	return queryJobs(ctx, t.Tx, `SELECT `+entryFields+`
-	FROM jobs
+	FROM `+t.tableName+`
 	ORDER BY scheduled_at DESC 
 	LIMIT $1 OFFSET $2`, limit, offset)
 }
 
 func (t *Tx) Get(ctx context.Context, id string) (*job.Job, error) {
 	return queryJob(ctx, t.Tx, `SELECT `+entryFields+`
-	FROM jobs 
+	FROM `+t.tableName+` 
 	WHERE id = $1`, id)
 }
 
 func (t *Tx) Update(ctx context.Context, job job.Job) error {
-	return exec(ctx, t.Tx, `UPDATE jobs
+	return exec(ctx, t.Tx, `UPDATE `+t.tableName+`
 	SET
 		status=$1, 
 		result=$2, 
@@ -69,13 +70,13 @@ func (t *Tx) Update(ctx context.Context, job job.Job) error {
 }
 
 func (t *Tx) Create(ctx context.Context, job job.Job) error {
-	return exec(ctx, t.Tx, `INSERT INTO jobs (id, queue_name, status, arguments, max_retry, retry_interval, scheduled_at) 
+	return exec(ctx, t.Tx, `INSERT INTO `+t.tableName+` (id, queue_name, status, arguments, max_retry, retry_interval, scheduled_at) 
 		VALUES ($1, $2, $3, $4, $5, $6, $7)`,
 		job.ID, job.QueueName, job.Status, job.Arguments, job.MaxRetry, job.RetryInterval, job.ScheduleAt)
 }
 
 func (t *Tx) Deschedule(ctx context.Context, id string) error {
-	return exec(ctx, t.Tx, `UPDATE jobs 
+	return exec(ctx, t.Tx, `UPDATE `+t.tableName+` 
 	SET 
 		updated_at=now(), 
 		status=$1 
@@ -85,7 +86,7 @@ func (t *Tx) Deschedule(ctx context.Context, id string) error {
 }
 
 func (t *Tx) ScheduleNow(ctx context.Context, id string) error {
-	return exec(ctx, t.Tx, `UPDATE jobs 
+	return exec(ctx, t.Tx, `UPDATE `+t.tableName+` 
 	SET 
 		updated_at=now(), 
 		scheduled_at=now(), 
@@ -95,7 +96,7 @@ func (t *Tx) ScheduleNow(ctx context.Context, id string) error {
 }
 
 func (t *Tx) Poll(ctx context.Context, queueName string) (*job.Job, error) {
-	query := `UPDATE jobs
+	query := `UPDATE ` + t.tableName + `
 		SET 
 			status=$1, 
 			started_at=now(),
@@ -103,7 +104,7 @@ func (t *Tx) Poll(ctx context.Context, queueName string) (*job.Job, error) {
 		WHERE 
 			id = (
 				SELECT id
-				FROM jobs 
+				FROM ` + t.tableName + ` 
 				WHERE status = $2
 					AND scheduled_at <= now()
 					AND queue_name = $3
@@ -117,7 +118,7 @@ func (t *Tx) Poll(ctx context.Context, queueName string) (*job.Job, error) {
 }
 
 func (t *Tx) RequeueTimeout(ctx context.Context, queueName string, timeout time.Time) error {
-	return exec(ctx, t.Tx, `UPDATE jobs 
+	return exec(ctx, t.Tx, `UPDATE `+t.tableName+` 
 	SET 
 		status=$1,
 		started_at=null,

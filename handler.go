@@ -20,11 +20,11 @@ type Mutate struct {
 	tx func(*sql.Tx) Tx
 }
 
-func newMutate(db *sql.DB) *Mutate {
+func newMutate(db *sql.DB, tableName string) *Mutate {
 	return &Mutate{
 		WrapperTx: *store.NewWrapperTx(db),
 		tx: func(tx *sql.Tx) Tx {
-			return newTx(tx)
+			return newTx(tx, tableName)
 		},
 	}
 }

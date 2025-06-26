@@ -47,6 +47,13 @@ func WithInstances(i int) WorkerOptionFunc {
 
 type ClientOptionFunc func(*Client) *Client
 
+func WithSetTableName(table string) ClientOptionFunc {
+	return func(c *Client) *Client {
+		c.tableName = table
+		return c
+	}
+}
+
 func WithSleepInterval(t time.Duration) ClientOptionFunc {
 	return func(c *Client) *Client {
 		c.sleepInterval = t

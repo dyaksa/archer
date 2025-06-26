@@ -82,6 +82,6 @@ func (t *transactionClient) Update(ctx context.Context, job job.Job) error {
 	return t.tx.Update(ctx, job)
 }
 
-func newTx(tx *sql.Tx) Tx {
-	return &transactionClient{tx: store.NewTx(tx)}
+func newTx(tx *sql.Tx, tableName string) Tx {
+	return &transactionClient{tx: store.NewTx(tx, tableName)}
 }

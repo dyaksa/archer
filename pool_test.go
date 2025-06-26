@@ -102,7 +102,7 @@ func TestPool_Run_ContextCancellation(t *testing.T) {
 	defer db.Close()
 
 	queueName := "test_context_cancel_queue"
-	realQueue := NewQueue(db, queueName)
+	realQueue := NewQueue(db, queueName, "job")
 	mockTx := new(MockTx)
 	realQueue.tx = func(dbtx *sql.Tx) Tx {
 		return mockTx
