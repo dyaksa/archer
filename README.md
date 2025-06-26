@@ -2,6 +2,8 @@
 
 Archer is a simple, lightweight queue/job worker that uses PostgreSQL as its backing store. It aims to provide an easy-to-use API for defining, enqueuing, and executing background jobs in your Go applications.
 
+For detailed documentation, see [the docs](https://github.com/dyaksa/archer/tree/main/docs).
+
 ## Features
 
 - `Simple API` – Define and register your jobs easily.
