@@ -1,16 +1,15 @@
-# Archer - Golang, Simple Job Queue Postgresql
+# Archer - Simple Job Queue for Go (PostgreSQL)
 
 Archer is a simple, lightweight queue/job worker that uses PostgreSQL as its backing store. It aims to provide an easy-to-use API for defining, enqueuing, and executing background jobs in your Go applications.
 
 ## Features
 
 - `Simple API` – Define and register your jobs easily.
-
 - `Backed by PostgreSQL` – Reliable storage and concurrency control.
-
 - `Flexible Worker Pool` – Customize worker concurrency (instances) and job timeouts as needed.
-
 - `Context Awareness` – Each job runs with a context, enabling you to cancel or time out jobs gracefully.
+- `Custom Table Name` – Store jobs in any table name you prefer.
+- `DAG Package` – Build complex workflows with directed acyclic graphs.
 
 ## Installation
 
@@ -182,9 +181,25 @@ func main() {
 		return err
 	}
 
-	slog.Info("done")
+slog.Info("done")
 }
 ```
+
+### Running the examples
+
+The `example` directory contains a sample worker and client. Start the worker with
+
+```bash
+go run ./example/worker
+```
+
+Then in another terminal, enqueue jobs using
+
+```bash
+go run ./example/client
+```
+
+These examples demonstrate how to register jobs and schedule them for execution.
 
 ## Options
 
@@ -192,10 +207,20 @@ You can configure the Archer client with various options:
 
 - `WithInstances(n int)`
   Sets the number of concurrent workers that will process a particular job type.
-
 - `WithTimeout(d time.Duration)`
   Sets a timeout for each job. If the job does not complete within this duration, it is considered failed/cancelled.
-
+- `WithRetryInterval(d time.Duration)`
+  Wait duration before retrying a failed job.
+- `WithMaxRetries(n int)`
+  Maximum number of retry attempts for a job.
+- `WithSetTableName(name string)`
+  Store jobs in a custom table name.
+- `WithSleepInterval(d time.Duration)`
+  Delay between polling cycles for new jobs.
+- `WithReaperInterval(d time.Duration)`
+  Interval for cleaning up finished or dead jobs.
+- `WithErrHandler(func(error))`
+  Custom handler for worker errors.
 - `archer.NewClient(&archer.Options{ ... })`
   - `Addr`: PostgreSQL host and port (e.g., localhost:5432)
   - `User`: DB user
