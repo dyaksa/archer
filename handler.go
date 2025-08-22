@@ -50,13 +50,15 @@ type handler struct {
 	worker          Worker
 	mutate          mutate
 	callbackSuccess func(ctx context.Context, job job.Job) (any, error)
+	callbackFailed  func(ctx context.Context, job job.Job) (any, error)
 }
 
-func newHandler(w Worker, mutate mutate, callbackSuccess func(ctx context.Context, job job.Job) (any, error)) *handler {
+func newHandler(w Worker, mutate mutate, callbackSuccess func(ctx context.Context, job job.Job) (any, error), callbackFailed func(ctx context.Context, job job.Job) (any, error)) *handler {
 	return &handler{
 		worker:          w,
 		mutate:          mutate,
 		callbackSuccess: callbackSuccess,
+		callbackFailed:  callbackFailed,
 	}
 }
 
@@ -108,6 +110,11 @@ func (h *handler) failure(ctx context.Context, j job.Job, err error) error {
 
 	if err := h.mutate.Update(ctx, j); err != nil {
 		return err
+	}
+
+	// Call the failure callback if it's defined
+	if h.callbackFailed != nil {
+		_, _ = h.callbackFailed(ctx, j)
 	}
 
 	return h.worker.OnFailure(ctx, j)

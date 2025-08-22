@@ -53,6 +53,13 @@ func WithCallbackSuccess(fn func(ctx context.Context, job job.Job) (any, error))
 	}
 }
 
+func WithCallbackFailed(fn func(ctx context.Context, job job.Job) (any, error)) WorkerOptionFunc {
+	return func(r registerConfig) registerConfig {
+		r.callbackFailed = fn
+		return r
+	}
+}
+
 type ClientOptionFunc func(*Client) *Client
 
 func WithSetTableName(table string) ClientOptionFunc {

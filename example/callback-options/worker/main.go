@@ -33,6 +33,10 @@ func CallTestCallback(ctx context.Context, job job.Job) (any, error) {
 		slog.Info("finished job request id: " + job.ID)
 	}()
 
+	if args.Method == "POST" {
+		return nil, fmt.Errorf("invalid method")
+	}
+
 	res := CallTestCallbackResults{Message: "Success!"}
 
 	return res, nil
@@ -49,7 +53,7 @@ func CallTestCallbackSuccess(ctx context.Context, job job.Job) (any, error) {
 }
 
 func CallTestCallbackFailed(ctx context.Context, job job.Job) (any, error) {
-	slog.Info(fmt.Sprintf("Job failed retry for : %d", job.RetryCount), "job_id", job.ID)
+	slog.Info("Job failed", "job_id", job.ID)
 
 	return map[string]any{
 		"callback_executed": true,
@@ -67,10 +71,13 @@ func main() {
 		DBName:   "local_fabd_revenue",
 	}, archer.WithSetTableName("jobs"))
 
+	slog.Info("waiting for jobs")
+
 	c.Register("call_test_callback", CallTestCallback,
 		archer.WithInstances(1),
 		archer.WithTimeout(1*time.Second),
 		archer.WithCallbackSuccess(CallTestCallbackSuccess),
+		archer.WithCallbackFailed(CallTestCallbackFailed),
 	)
 
 	if err := c.Start(); err != nil {
