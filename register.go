@@ -1,13 +1,17 @@
 package archer
 
 import (
+	"context"
 	"time"
+
+	"github.com/dyaksa/archer/job"
 )
 
 type registerConfig struct {
-	w         Worker
-	instances int
-	timeout   time.Duration
+	w               Worker
+	instances       int
+	timeout         time.Duration
+	callbackSuccess func(ctx context.Context, job job.Job) (any, error)
 }
 
 type register map[string]registerConfig
