@@ -1,6 +1,7 @@
 package archer
 
 import (
+	"context"
 	"time"
 
 	"github.com/dyaksa/archer/job"
@@ -41,6 +42,20 @@ func WithTimeout(t time.Duration) WorkerOptionFunc {
 func WithInstances(i int) WorkerOptionFunc {
 	return func(r registerConfig) registerConfig {
 		r.instances = i
+		return r
+	}
+}
+
+func WithCallbackSuccess(fn func(ctx context.Context, job job.Job) (any, error)) WorkerOptionFunc {
+	return func(r registerConfig) registerConfig {
+		r.callbackSuccess = fn
+		return r
+	}
+}
+
+func WithCallbackFailed(fn func(ctx context.Context, job job.Job) (any, error)) WorkerOptionFunc {
+	return func(r registerConfig) registerConfig {
+		r.callbackFailed = fn
 		return r
 	}
 }

@@ -162,7 +162,7 @@ func (c *Client) start() {
 		q := c.queue(name)
 
 		for i := 0; i < config.instances; i++ {
-			s := newPool(q, c.mutate, config.w, c.sleepInterval)
+			s := newPool(q, c.mutate, config.w, c.sleepInterval, config.callbackSuccess, config.callbackFailed)
 			c.spawn.Spawn(s)
 		}
 
