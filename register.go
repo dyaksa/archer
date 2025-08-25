@@ -11,8 +11,8 @@ type registerConfig struct {
 	w               Worker
 	instances       int
 	timeout         time.Duration
-	callbackSuccess func(ctx context.Context, job job.Job) (any, error)
-	callbackFailed  func(ctx context.Context, job job.Job) (any, error)
+	callbackSuccess func(ctx context.Context, job job.Job, res any) (any, error)
+	callbackFailed  func(ctx context.Context, job job.Job, err error) (any, error)
 }
 
 type register map[string]registerConfig

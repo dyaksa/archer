@@ -13,7 +13,7 @@ type pool struct {
 	sleepInterval time.Duration
 }
 
-func newPool(q *Queue, m mutate, w Worker, sleepInterval time.Duration, callbackSuccess func(ctx context.Context, job job.Job) (any, error), callbackFailed func(ctx context.Context, job job.Job) (any, error)) *pool {
+func newPool(q *Queue, m mutate, w Worker, sleepInterval time.Duration, callbackSuccess func(ctx context.Context, job job.Job, res any) (any, error), callbackFailed func(ctx context.Context, job job.Job, err error) (any, error)) *pool {
 	return &pool{
 		queue:         *q,
 		handler:       newHandler(w, m, callbackSuccess, callbackFailed),

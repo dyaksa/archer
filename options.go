@@ -46,14 +46,14 @@ func WithInstances(i int) WorkerOptionFunc {
 	}
 }
 
-func WithCallbackSuccess(fn func(ctx context.Context, job job.Job) (any, error)) WorkerOptionFunc {
+func WithCallbackSuccess(fn func(ctx context.Context, job job.Job, res any) (any, error)) WorkerOptionFunc {
 	return func(r registerConfig) registerConfig {
 		r.callbackSuccess = fn
 		return r
 	}
 }
 
-func WithCallbackFailed(fn func(ctx context.Context, job job.Job) (any, error)) WorkerOptionFunc {
+func WithCallbackFailed(fn func(ctx context.Context, job job.Job, err error) (any, error)) WorkerOptionFunc {
 	return func(r registerConfig) registerConfig {
 		r.callbackFailed = fn
 		return r
