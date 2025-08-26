@@ -110,7 +110,7 @@ func TestPool_Run_ContextCancellation(t *testing.T) {
 
 	mockHandler := NewMockHandler()
 
-	p := newPool(realQueue, nil, nil, 10*time.Millisecond)
+	p := newPool(realQueue, nil, nil, 10*time.Millisecond, nil, nil)
 	p.handler = mockHandler
 
 	ctx, cancel := context.WithCancel(context.Background())
