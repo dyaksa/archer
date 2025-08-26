@@ -108,8 +108,8 @@ func (h *handler) failure(ctx context.Context, j job.Job, err error) error {
 
 	j = j.SetStatus(job.StatusFailed)
 
-	if err := h.mutate.Update(ctx, j); err != nil {
-		return err
+	if errUpdate := h.mutate.Update(ctx, j); errUpdate != nil {
+		return errUpdate
 	}
 
 	// Call the failure callback if it's defined
