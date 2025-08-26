@@ -42,8 +42,10 @@ func CallTestCallback(ctx context.Context, job job.Job) (any, error) {
 	return res, nil
 }
 
-func CallTestCallbackSuccess(ctx context.Context, job job.Job) (any, error) {
+func CallTestCallbackSuccess(ctx context.Context, job job.Job, res any) (any, error) {
 	slog.Info("Job completed successfully", "job_id", job.ID)
+
+	slog.Info("RESULT SUCCESS", "result", res)
 
 	return map[string]any{
 		"callback_executed": true,
@@ -52,8 +54,9 @@ func CallTestCallbackSuccess(ctx context.Context, job job.Job) (any, error) {
 	}, nil
 }
 
-func CallTestCallbackFailed(ctx context.Context, job job.Job) (any, error) {
+func CallTestCallbackFailed(ctx context.Context, job job.Job, err error) (any, error) {
 	slog.Info("Job failed", "job_id", job.ID)
+	slog.Error("Job failed", "error", err.Error())
 
 	return map[string]any{
 		"callback_executed": true,

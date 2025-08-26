@@ -49,11 +49,11 @@ func (m *Mutate) Update(ctx context.Context, j job.Job) error {
 type handler struct {
 	worker          Worker
 	mutate          mutate
-	callbackSuccess func(ctx context.Context, job job.Job) (any, error)
-	callbackFailed  func(ctx context.Context, job job.Job) (any, error)
+	callbackSuccess func(ctx context.Context, job job.Job, res any) (any, error)
+	callbackFailed  func(ctx context.Context, job job.Job, err error) (any, error)
 }
 
-func newHandler(w Worker, mutate mutate, callbackSuccess func(ctx context.Context, job job.Job) (any, error), callbackFailed func(ctx context.Context, job job.Job) (any, error)) *handler {
+func newHandler(w Worker, mutate mutate, callbackSuccess func(ctx context.Context, job job.Job, res any) (any, error), callbackFailed func(ctx context.Context, job job.Job, err error) (any, error)) *handler {
 	return &handler{
 		worker:          w,
 		mutate:          mutate,
@@ -114,7 +114,7 @@ func (h *handler) failure(ctx context.Context, j job.Job, err error) error {
 
 	// Call the failure callback if it's defined
 	if h.callbackFailed != nil {
-		_, _ = h.callbackFailed(ctx, j)
+		_, _ = h.callbackFailed(ctx, j, err)
 	}
 
 	return h.worker.OnFailure(ctx, j)
@@ -143,7 +143,7 @@ func (h *handler) success(ctx context.Context, j job.Job, res any) error {
 
 	// Call the success callback if it's defined
 	if h.callbackSuccess != nil {
-		_, _ = h.callbackSuccess(ctx, j)
+		_, _ = h.callbackSuccess(ctx, j, res)
 	}
 
 	return nil
