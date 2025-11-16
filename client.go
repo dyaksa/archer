@@ -60,7 +60,13 @@ func NewClient(opt *Options, options ...ClientOptionFunc) *Client {
 	dsn.WriteString(opt.Addr)
 	dsn.WriteString("/")
 	dsn.WriteString(opt.DBName)
-	dsn.WriteString("?sslmode=disable")
+
+	// ssl option
+	sslMode := "disable"
+	if opt.SSL != "" {
+		sslMode = opt.SSL
+	}
+	dsn.WriteString("?sslmode=" + sslMode)
 
 	db, err := sql.Open("postgres", dsn.String())
 	if err != nil {
